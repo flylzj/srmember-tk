@@ -1,22 +1,16 @@
 # coding: utf-8
 from openpyxl import load_workbook
-from pprint import pprint
 
 
 class Excel:
-    def __init__(self):
-        self.sheet = None
-        self.orders = []
-
     def read_excel(self, filename):
-        try:
-            wb = load_workbook(filename)
-            self.sheet = wb[wb.sheetnames[0]]
-        except Exception as e:
-            print(e)
+        wb = load_workbook(filename)
+        sheet = wb[wb.sheetnames[0]]
+        return sheet
 
-    def get_orders(self):
-        for row in self.sheet.iter_rows(min_row=2):
+    def get_orders(self, sheet):
+        orders = []
+        for row in sheet.iter_rows(min_row=2):
             order = dict()
             order["friend_phone"] = str(row[0].value)
             order["name"] = row[1].value
@@ -28,19 +22,36 @@ class Excel:
                     continue
                 order["goods"].append(
                     {
-                        "good_name": row[i].value,
+                        "abiid": row[i].value,
                         "num": row[i + 1].value
                     }
                 )
-            self.orders.append(order)
+            orders.append(order)
+        return orders
 
     def myorders(self, filename):
-        self.read_excel(filename)
-        self.get_orders()
-        return self.orders
+        try:
+            sheet = self.read_excel(filename)
+        except Exception as e:
+            return {
+                "code": 1,
+                "msg": "读取excel失败,请检查文件, {}\n".format(e)
+            }
+        try:
+            orders = self.get_orders(sheet)
+        except Exception as e:
+            return {
+                "code": 1,
+                "msg": "读取订单失败,excel格式错误, {}\n".format(e)
+            }
+        return {
+            "msg": "读取订单成功\n",
+            "code": 0,
+            "data": orders
+        }
 
 
 if __name__ == '__main__':
     filename = "test.xlsx"
     e = Excel()
-    e.myorders(filename)
+    print(e.myorders(filename))

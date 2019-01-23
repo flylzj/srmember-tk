@@ -73,10 +73,8 @@ class Srmember(object):
         headers = self.make_token_headers()
         headers["Content-Type"] = "application/json"
         r = requests.post(self.login_api, json=data, headers=headers)
-        try:
-            self.token = r.json().get("data").get("token").get("token")
-        except Exception as e:
-            print(e)
+        self.token = r.json().get("data").get("token").get("token")
+        return True
 
     # 获取购物车里的商品
     def get_shopcart(self):
@@ -108,15 +106,10 @@ class Srmember(object):
     def get_vip_friend(self, phone):
         headers = self.make_token_headers(user=True)
         r = requests.get(self.vip_api, headers=headers)
-        try:
-            friends = r.json().get("data")
-            for friend in friends:
-                if friend.get("phone") == phone:
-                    return friend.get("id")
-            return None
-        except Exception as e:
-            print(e)
-            return None
+        friends = r.json().get("data")
+        for friend in friends:
+            if friend.get("phone") == phone:
+                return friend
 
     # 创建订单
     def create_order(self, abiid_list, remark=""):
@@ -126,12 +119,8 @@ class Srmember(object):
             "remark": remark
         }
         r = requests.post(self.order_api, json=data, headers=headers)
-        try:
-            print(r.text)
-            return r.json().get("data").get("OBI_ID")
-        except Exception as e:
-            print(e)
-            return None
+        print(r.json())
+        return r.json().get("data").get("OBI_ID")
 
     # 委托好友
     def buy_by_friend(self, order_id, friend_id, name, tel, address):
@@ -144,7 +133,7 @@ class Srmember(object):
             "address": address
         }
         r = requests.post(self.buy_api, headers=headers, json=data)
-        print(r.text)
+        return r.text
 
     def make_a_order(self, goods, phone, user_info):
         self.clear_shopcart()
