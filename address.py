@@ -2396,6 +2396,10 @@ addresses = \
 
 
 def check_address(address):
+    if not address:
+        return False
+    elif address[0] == "0":
+        return True
     add = re.search(r'(.*?)(市|省|自治区)(.*?)(市)(.*?)(区|县|市)', address)
     if add:
         add = add.groups()
