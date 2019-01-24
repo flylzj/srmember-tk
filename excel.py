@@ -12,20 +12,21 @@ class Excel:
         orders = []
         for row in sheet.iter_rows(min_row=2):
             order = dict()
-            order["friend_phone"] = str(row[0].value)
-            order["name"] = row[1].value
-            order["tel"] = str(row[2].value)
-            order["address"] = row[3].value
+            order["item"] = str(row[0].value)
+            order["friend_phone"] = str(row[1].value)
+            order["name"] = row[2].value
+            order["tel"] = str(row[3].value)
+            order["address"] = row[4].value
             order["goods"] = []
-            for i in range(4, len(row) - 1, 2):
-                if not row[i].value:
-                    continue
-                order["goods"].append(
-                    {
-                        "abiid": row[i].value,
-                        "num": row[i + 1].value
-                    }
-                )
+            for i in range(5, len(row) - 1, 3):
+                if row[i].value and row[i+1].value and row[i+2].value:
+                    order["goods"].append(
+                        {
+                            "abiid": row[i].value,
+                            "good_name": row[i+1].value,
+                            "num": row[i+2].value
+                        }
+                    )
             orders.append(order)
         return orders
 
@@ -49,9 +50,3 @@ class Excel:
             "code": 0,
             "data": orders
         }
-
-
-if __name__ == '__main__':
-    filename = "test.xlsx"
-    e = Excel()
-    print(e.myorders(filename))

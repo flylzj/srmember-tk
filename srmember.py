@@ -16,6 +16,8 @@ class Srmember(object):
         self.order_api = "https://srmemberapp.srgow.com/order/createv2/"
         self.buy_api = "https://srmemberapp.srgow.com/order/wish/tomall"
         self.search_api = "https://srmemberapp.srgow.com/goods/search/1"
+        self.address_api = "https://srmemberapp.srgow.com/user/address"
+        self.good_api = "http://b2carticleinfo.lib.cdn.srgow.com/api/v1/Article"
         self.token = None
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Linux; Android 4.4.2; HUAWEI MLA-AL10 Build/HUAWEIMLA-AL10) AppleWebKit"
@@ -119,8 +121,7 @@ class Srmember(object):
             "remark": remark
         }
         r = requests.post(self.order_api, json=data, headers=headers)
-        print(r.json())
-        return r.json().get("data").get("OBI_ID")
+        return r.json()
 
     # 委托好友
     def buy_by_friend(self, order_id, friend_id, name, tel, address):
@@ -133,7 +134,7 @@ class Srmember(object):
             "address": address
         }
         r = requests.post(self.buy_api, headers=headers, json=data)
-        return r.text
+        return r.json()
 
     def make_a_order(self, goods, phone, user_info):
         self.clear_shopcart()
@@ -161,6 +162,44 @@ class Srmember(object):
             return data[0].get("abiid")
         except Exception as e:
             print(e)
+            return None
+
+    def add_new_address(self, info):
+        headers = self.make_token_headers(True)
+        data = {
+            "tel": info.get("tel"),
+            "name": info.get("name"),
+            "detail": info.get("address"),
+            "id": "",
+            "isdefault": 0
+        }
+        r = requests.post(self.address_api, headers=headers, json=data)
+        try:
+            print(r.json())
+            if r.json().get("success"):
+                address_id = r.json().get("data")
+                self.delete_address(address_id)
+                return True
+            else:
+                return False
+        except Exception as e:
+            return False
+
+    def delete_address(self, address_id):
+        headers = self.make_token_headers(True)
+        url = self.address_api + "/" + str(address_id)
+        requests.post(url, headers=headers)
+
+    def get_good_info(self, abiid):
+        headers = self.make_token_headers()
+        parmas = {
+            "languageid": 1,
+            "abiid": abiid
+        }
+        r = requests.get(self.good_api, headers=headers, params=parmas)
+        try:
+            return r.json()
+        except Exception as e:
             return None
 
 

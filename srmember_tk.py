@@ -13,7 +13,7 @@ class Root(tk.Tk):
         self.mt = Mytoken()
         self.check()
         self.wm_title("自动下单")
-        self.resizable(0, 0)
+        self .resizable(0, 0)
         self.msg_queue = Queue()
         self.account_frame = AccountFrame()
         self.file_frame = FileFrame()
