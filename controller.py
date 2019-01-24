@@ -52,11 +52,11 @@ class Controller:
             if not friend_id:
                 continue
 
-            # if not self.order_to_friend(order_id, friend_id, order):
-            #     msg_queue.put(self.order_end_line)
-            #     continue
-            # else:
-            #     msg_queue.put("下单成功\n")
+            if not self.order_to_friend(order_id, friend_id, order):
+                msg_queue.put(self.order_end_line)
+                continue
+            else:
+                msg_queue.put("下单成功\n")
 
             msg_queue.put(self.order_end_line)
         msg_queue.put("自动下单完成")
