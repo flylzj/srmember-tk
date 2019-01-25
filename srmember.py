@@ -18,6 +18,7 @@ class Srmember(object):
         self.search_api = "https://srmemberapp.srgow.com/goods/search/1"
         self.address_api = "https://srmemberapp.srgow.com/user/address"
         self.good_api = "http://b2carticleinfo.lib.cdn.srgow.com/api/v1/Article"
+        self.good_price_api = "https://srmemberapp.srgow.com/goods/prices/{}"
         self.token = None
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Linux; Android 4.4.2; HUAWEI MLA-AL10 Build/HUAWEIMLA-AL10) AppleWebKit"
@@ -202,4 +203,18 @@ class Srmember(object):
         except Exception as e:
             return None
 
+    def get_good_price(self, abiid):
+        headers = self.make_token_headers()
+        url = self.good_price_api.format(abiid)
+        r = requests.get(url, headers=headers)
+        try:
+            data = r.json().get("data")
+            return data.get("price")
+        except Exception as e:
+            return 0
+
+
+if __name__ == '__main__':
+    sr = Srmember()
+    print(sr.get_good_info(78070))
 
