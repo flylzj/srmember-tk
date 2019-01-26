@@ -69,7 +69,7 @@ class FileFrame(tk.Frame):
     def __init__(self):
         super().__init__()
         self.filename = tk.StringVar(self, name="filename")
-        self.file_path = tk.Text(self, width=23, height=1)
+        self.file_path = tk.Entry(self, textvariable=self.filename)
         self.file_button = tk.Button(self, text="选择订单文件", command=self.show_filename)
         self.submit_button = tk.Button(self, text="开始自动下单")
         self.create()
@@ -80,7 +80,7 @@ class FileFrame(tk.Frame):
             tk.messagebox.showinfo(title="提示", message="文件格式错误")
             return
         self.setvar(name="filename", value=file)
-        self.file_path.insert(tk.END, self.getvar("filename"))
+        # self.file_path.insert(tk.END, self.getvar("filename"))
 
     def create(self):
         self.file_path.grid(row=0, column=0, sticky=tk.E)

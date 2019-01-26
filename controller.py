@@ -68,6 +68,7 @@ class Controller:
 
                 friend_id = self.get_friend(order)
                 if not friend_id:
+                    msg_queue.put(self.order_end_line)
                     order["error"] = 5
                     continue
 
