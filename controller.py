@@ -44,9 +44,10 @@ class Controller:
                     order["error"] = 2
                     continue
 
-                if not self.check_good_info(order):
+                result = self.check_good_info(order)
+                if result != 0:
                     msg_queue.put(self.order_end_line)
-                    order["error"] = 3
+                    order["error"] = result
                     continue
 
                 if not self.clear_shopcart():
@@ -78,6 +79,7 @@ class Controller:
                 msg_queue.put("下单成功\n")
                 msg_queue.put(self.order_end_line)
             except Exception as e:
+                print(e)
                 msg_queue.put("\n网络错误, 请点击下单重试\n")
                 msg_queue.put(self.order_end_line)
                 order["error"] = 7
@@ -167,13 +169,13 @@ class Controller:
         goods = order.get("goods")
         msg_queue.put("正在核对商品信息\n")
         if not goods:
-            return False
+            return 3
         for good in goods:
             msg_queue.put("正在核对商品 {}\n".format(good.get("good_name")))
             good_info = self.srmember.get_good_info(good.get("abiid"))
             if good_info.get("abiid") != good.get("abiid"):
                 msg_queue.put("商品不存在!\n")
-                return False
+                return 3
             msg_queue.put("商品id: {}=>{}\n商品名称: {}={}\n商品价格: {}=>{}\n".format(
                 good.get("abiid"),
                 good_info.get("abiid"),
@@ -184,8 +186,8 @@ class Controller:
             ))
             if not self.srmember.get_good_price(good.get("abiid")) == good.get("price"):
                 msg_queue.put("商品价格不匹配\n")
-                return False
-        return True
+                return 8
+        return 0
 
     def create_order(self, order):
         msg_queue = self.window.msg_queue
@@ -215,6 +217,9 @@ class Controller:
         msg_queue = self.window.msg_queue
         try:
             msg_queue.put("正在获取委托人id\n")
+            if order.get("friend_phone") not in self.window.friends:
+                msg_queue.put("委托人不是规定的委托人\n")
+                return False
             friend = self.srmember.get_vip_friend(order.get("friend_phone"))
             if not friend:
                 msg_queue.put("委托人id获取失败,请检查好友关系\n")

@@ -64,16 +64,17 @@ class Excel:
         errors = {
             1: "地址错误",
             2: "电话号码错误",
-            3: "商品错误",
+            3: "商品id错误",
             4: "下单失败, 商品可能不存在或缺货",
             5: "委托人号码错误",
             6: "下单失败, 服务器错误",
-            7: "网络错误"
+            7: "网络错误",
+            8: "商品价格错误"
         }
         wb = Workbook()
         wb.add_named_style(highlight)
         ws = wb.active
-        ws.append(["error", "item", "委托人", "姓名", "电话", "地址", "商品id", "商品名称", "数量"])
+        ws.append(["error", "item", "委托人", "姓名", "电话", "地址", "商品id", "商品名称", "数量", "商品单价"])
         row = 2
         for order in orders:
             data = [
@@ -92,21 +93,23 @@ class Excel:
             else:
                 data.insert(0, "下单成功")
             ws.append(data)
-
+            high_fill = PatternFill(fill_type='solid', fgColor="28ff86")
             if error == 1:
-                ws["F" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["F" + str(row)].fill = high_fill
             elif error == 2:
-                ws["E" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["E" + str(row)].fill = high_fill
             elif error == 3:
-                ws["G" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["G" + str(row)].fill = high_fill
             elif error == 4:
-                ws["A" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["A" + str(row)].fill = high_fill
             elif error == 5:
-                ws["C" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["C" + str(row)].fill = high_fill
             elif error == 6:
-                ws["A" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["A" + str(row)].fill = high_fill
             elif error == 7:
-                ws["A" + str(row)].fill = PatternFill(fill_type='solid', fgColor="28ff86")
+                ws["A" + str(row)].fill = high_fill
+            elif error == 8:
+                ws["J" + str(row)].fill = high_fill
             row += 1
         if os.path.exists("out.xlsx"):
             try:

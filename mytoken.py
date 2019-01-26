@@ -22,10 +22,10 @@ class Mytoken:
         mac = self.get_mac_address()
         return self.generate_md5(mac)
 
-    def generate_token(self, d, timeout=3600 * 24):
+    def generate_token(self, d, friends, timeout=3600 * 24):
         s = Serializer(self.pwd, expires_in=timeout)
         try:
-            token = s.dumps({"mac": d})
+            token = s.dumps({"mac": d, "friends": friends})
             return token.decode()
         except Exception as e:
             return None
@@ -51,7 +51,9 @@ class Mytoken:
         s = Serializer("feed5d47c860f422712ac902a89865db")
         try:
             result = s.loads(token)
-            return result.get("mac") == d
+            if result.get("mac") != d:
+                return False
+            return result.get("friends")
         except Exception as e:
             return False
 
@@ -62,5 +64,6 @@ class Mytoken:
 
 if __name__ == '__main__':
     mytoken = Mytoken()
-    token = mytoken.load_token()
-    mytoken.check_token(token)
+    t = mytoken.generate_token("aaaaaa", [])
+    print(t)
+    mytoken.check_token(t)

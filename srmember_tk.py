@@ -11,6 +11,7 @@ class Root(tk.Tk):
     def __init__(self):
         super().__init__()
         self.mt = Mytoken()
+        self.friends = None
         self.check()
         self.wm_title("自动下单")
         self .resizable(0, 0)
@@ -22,11 +23,13 @@ class Root(tk.Tk):
         self.log_info()
 
     def check(self):
-        if not self.mt.check():
+        friends = self.mt.check()
+        if not friends:
             tk.messagebox.showwarning(title="未授权", message="无权使用")
             tkinter.messagebox.showinfo(title="提示", message="请将这串代码发给管理员: " + self.mt.gene_d())
             exit()
         else:
+            self.friends = friends
             tk.messagebox.showinfo(message="欢迎使用")
 
     def log_info(self):
