@@ -80,7 +80,6 @@ class Controller:
                 msg_queue.put("下单成功\n")
                 msg_queue.put(self.order_end_line)
             except Exception as e:
-                print(e)
                 msg_queue.put("\n网络错误, 请点击下单重试\n")
                 msg_queue.put(self.order_end_line)
                 order["error"] = 7

@@ -119,4 +119,69 @@ class Excel:
         wb.save("out.xlsx")
         return True
 
+    def save_auther_orders(self, orders):
+        highlight = NamedStyle(name="highlight")
+        highlight.font = Font(bold=True, size=20)
+        bd = Side(style='thick', color="000000")
+        highlight.border = Border(left=bd, top=bd, right=bd, bottom=bd)
+
+        wb = Workbook()
+        wb.add_named_style(highlight)
+        ws = wb.active
+        ws.append(["姓名", "电话", "地址", "商品id", "商品名称", "数量", "商品单价"])
+        row = 2
+        for order in orders:
+            data = [
+                order.get("name"),
+                order.get("tel"),
+                order.get("address"),
+            ]
+            goods = order.get("goods")
+            for good in goods:
+                data += [good.get("abiid"), good.get("good_name"), good.get("num"), good.get("price")]
+            ws.append(data)
+            high_fill = PatternFill(fill_type='solid', fgColor="28ff86")
+            errors = order.get("errors")
+            if errors.get("tel_error"):
+                ws["B" + str(row)].fill = high_fill
+
+            if errors.get("address_error"):
+                ws["C" + str(row)].fill = high_fill
+
+            if errors.get("good_error"):
+                ws["D" + str(row)].fill = high_fill
+
+            if errors.get("price_error"):
+                ws["G" + str(row)].fill = high_fill
+
+            row += 1
+        if os.path.exists("out.xlsx"):
+            try:
+                os.remove("out.xlsx")
+            except Exception as e:
+                return False
+        wb.save("out.xlsx")
+        return True
+
+    def get_auther_orders(self, sheet):
+        orders = []
+        for row in sheet.iter_rows(min_row=2):
+            order = dict()
+            order["name"] = str(row[0].value)
+            order["tel"] = str(row[1].value)
+            order["address"] = row[2].value
+            order["goods"] = []
+            for i in range(3, len(row) - 1, 4):
+                if row[i].value and row[i+1].value and row[i+2].value:
+                    order["goods"].append(
+                        {
+                            "abiid": row[i].value,
+                            "good_name": row[i+1].value,
+                            "num": row[i+2].value,
+                            "price": row[i+3].value
+                        }
+                    )
+            orders.append(order)
+        return [order for order in orders if order.get("goods")]
+
 
