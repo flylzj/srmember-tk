@@ -4,6 +4,8 @@ from srmember import Srmember
 from srmember_tk import Root
 from threading import Thread
 from address import check_address
+import tkinter.messagebox
+import time
 import re
 
 
@@ -25,6 +27,10 @@ class Controller:
     def start_order(self):
         self.window.delete_log_info()
         msg_queue = self.window.msg_queue
+        time_interval = self.window.getvar('interval')
+        if not time_interval or not time_interval.isdigit():
+            tkinter.messagebox.showwarning(message='时间间隔错误')
+            return
         if not self.srmember_login():
             return
         orders = self.read_excel()
@@ -32,7 +38,6 @@ class Controller:
             return
         for order in orders:
             msg_queue.put(self.order_start_line)
-
             try:
                 if not self.check_order_address(order):
                     msg_queue.put(self.order_end_line)
@@ -84,6 +89,8 @@ class Controller:
                 msg_queue.put(self.order_end_line)
                 order["error"] = 7
                 continue
+            msg_queue.put("开始暂停, 暂停时间为{}\n".format(time_interval))
+            time.sleep(int(time_interval))
 
         msg_queue.put("自动下单完成\n")
         msg_queue.put("正在导出结果\n")
@@ -109,7 +116,6 @@ class Controller:
             return False
 
     def read_excel(self):
-        msg_queue = self.window.msg_queue
         filename = self.window.getvar("filename")
         data = self.exceler.myorders(filename)
         self.window.msg_queue.put(data.get("msg"))

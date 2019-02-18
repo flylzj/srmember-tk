@@ -18,6 +18,7 @@ class Root(tk.Tk):
         self.msg_queue = Queue()
         self.account_frame = AccountFrame()
         self.file_frame = FileFrame()
+        self.time_frame = TimeIntervalFrame()
         self.info_text = ScrolledText(self)
         self.create()
         self.log_info()
@@ -43,6 +44,7 @@ class Root(tk.Tk):
 
     def create(self):
         self.account_frame.pack()
+        self.time_frame.pack()
         self.file_frame.pack()
         self.info_text.pack()
 
@@ -86,6 +88,19 @@ class FileFrame(tk.Frame):
         self.file_path.grid(row=0, column=0, sticky=tk.E)
         self.file_button.grid(row=0, column=1)
         self.submit_button.grid(row=0, column=2)
+
+
+class TimeIntervalFrame(tk.Frame):
+    def __init__(self):
+        super().__init__()
+        self.time_interval = tk.StringVar(self, name="interval")
+        self.time_label = tk.Label(self, text='请输入下单时间间隔/秒(默认0秒)')
+        self.time_entry = tk.Entry(self, textvariable=self.time_interval)
+        self.create()
+
+    def create(self):
+        self.time_label.grid(row=0, column=0)
+        self.time_entry.grid(row=0, column=1)
 
 
 if __name__ == '__main__':
